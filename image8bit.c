@@ -183,7 +183,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   image->width = width;
   image->height = height;
   image->maxval = maxval; 
-  image->pixel = (uint8 *)malloc(width*height*sizeof(uint8));
+  image->pixel = (uint8 *)calloc(width*height*sizeof(uint8));
 
   if (image->pixel == NULL) {
     free(image);
@@ -200,10 +200,8 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// Should never fail, and should preserve global errno/errCause.
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
-  assert ((*imgp) != NULL);
-
   // Insert your code here!
-  free((*imgp)->pixel);
+  //free((*imgp)->pixel);
   free(*imgp);
   *imgp = NULL;
 }
@@ -420,6 +418,19 @@ void ImageNegative(Image img) { ///
 void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
+
+  for (int y = 0; y < img->height; y++) {
+    for (int x = 0; x < img->width; x++) {
+      uint8 level = ImageGetPixel(img, x, y);
+      if (level < thr) {
+        ImageSetPixel(img, x, y, 0); // Set pixel to black
+      } else {
+        ImageSetPixel(img, x, y, img->maxval); // Set pixel to white
+      }
+    }
+  }
+  
+
 }
 
 /// Brighten image by a factor.
@@ -428,8 +439,19 @@ void ImageThreshold(Image img, uint8 thr) { ///
 /// darken the image if factor<1.0.
 void ImageBrighten(Image img, double factor) { ///
   assert (img != NULL);
-  // ? assert (factor >= 0.0);
+  assert (factor >= 0.0);
   // Insert your code here!
+  for (int y = 0; y < img->height; y++) {
+    for (int x = 0; x < img->width; x++) {
+      uint8 level = ImageGetPixel(img, x, y);
+      level = (uint8)(level * factor); // Multiply pixel level by factor
+      if (level > img->maxval) {
+        level = img->maxval; // Saturate at maxval
+      }
+      ImageSetPixel(img, x, y, level);
+    }
+  }
+
 }
 
 
@@ -466,7 +488,7 @@ Image ImageRotate(Image img) { ///
       uint8 level = ImageGetPixel(img, x, y);
       
       // Set the pixel in the rotated image
-      ImageSetPixel(rotatedImg, img->height - y, x, level);
+      ImageSetPixel(rotatedImg, y, img->width - x -1, level);
     }
   }
   
@@ -499,7 +521,7 @@ Image ImageMirror(Image img) { ///
       uint8 level = ImageGetPixel(img, x, y);
       
       // Set the pixel in the mirrored image
-      ImageSetPixel(mirroredImg, img->width - x, y, level);
+      ImageSetPixel(mirroredImg, img->width - x - 1, y, level);
     }
   }
   
@@ -521,6 +543,23 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   assert (ImageValidRect(img, x, y, w, h));
   // Insert your code here!
+
+  // Create a new image with cropped dimensions
+  Image croppedImg = ImageCreate(w, h, img->maxval);
+  
+  for (int i = 0; i < h; i++) {
+    for (int j = 0; j < w; j++) {
+      // Get the pixel level from the original image
+      uint8 level = ImageGetPixel(img, x + j, y + i);
+      
+      // Set the pixel in the cropped image
+      ImageSetPixel(croppedImg, j, i, level);
+    }
+  }
+  
+  return croppedImg;
+  
+
 }
 
 
