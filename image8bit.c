@@ -338,6 +338,19 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
+  assert (w >= 0 && h >= 0); // Ensure width and height are non-negative
+
+  // Check if the top-left corner (x, y) is inside the image
+  if (!ImageValidPos(img, x, y)) {
+    return 0;
+  }
+
+  // Check if the bottom-right corner (x + w, y + h) is inside the image
+  if (!ImageValidPos(img, x + w - 1, y + h - 1)) {
+    return 0;
+  }
+
+  return 1; // The rectangular area is completely inside the image
 }
 
 /// Pixel get & set operations
