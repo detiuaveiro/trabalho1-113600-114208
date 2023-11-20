@@ -176,14 +176,19 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 
   if (image == NULL) {
     perror("ImageCreate");
-    exit(2);
+    return NULL;
   }
 
   image->width = width;
   image->height = height;
   image->maxval = (int)maxval; 
-  image->pixel = maxval;
+  image->pixel = (uint8 *)malloc(width*height*sizeof(uint8));
 
+  if (image->pixel == NULL) {
+    free(image);
+    perror("PixelCreate");
+    return NULL;
+  }
   return image;
 }
 
