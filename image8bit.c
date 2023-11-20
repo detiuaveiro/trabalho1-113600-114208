@@ -622,16 +622,21 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
   
-  // Crop the subimage from img1 using ImageCrop function
-  Image subImg = ImageCrop(img1, x, y, img2->width, img2->height);
-
-  // Compare the cropped subimage with img2
-  int match = ImageCompare(subImg, img2);
-
-  // Free the memory allocated for the cropped subimage
-  free(subImg);
-
-  return match;
+  // Iterate over the pixels of img2
+  for (int i = 0; i < img2->height; i++) {
+    for (int j = 0; j < img2->width; j++) {
+      // Get the pixel levels from img1 and img2
+      uint8 level1 = ImageGetPixel(img1, x + j, y + i);
+      uint8 level2 = ImageGetPixel(img2, j, i);
+      
+      // Compare the pixel levels
+      if (level1 != level2) {
+        return 0; // Pixels don't match
+      }
+    }
+  }
+  
+  return 1; // All pixels match
 }
 
 /// Locate a subimage inside another image.
@@ -667,8 +672,49 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
-  // Insert your code here!
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
+  
+  // Create a temporary image to store the blurred result
+  Image tempImg = ImageCreate(img->width, img->height, img->maxval);
+  
+  // Iterate over the pixels of the image
+  for (int y = 0; y < img->height; y++) {
+    for (int x = 0; x < img->width; x++) {
+      // Calculate the sum of pixel values in the neighborhood
+      int sum = 0;
+      int count = 0;
+      for (int i = -dy; i <= dy; i++) {
+        for (int j = -dx; j <= dx; j++) {
+          // Calculate the coordinates of the current pixel
+          int nx = x + j;
+          int ny = y + i;
+          
+          // Check if the pixel is within the image boundaries
+          if (nx >= 0 && nx < img->width && ny >= 0 && ny < img->height) {
+            // Add the pixel value to the sum
+            sum += ImageGetPixel(img, nx, ny);
+            count++;
+          }
+        }
+      }
+      
+      // Calculate the average pixel value
+      uint8 average = (uint8)round((sum / (double)count));
+      
+      // Set the average pixel value in the temporary image
+      ImageSetPixel(tempImg, x, y, average);
+    }
+  }
+  
+  // Copy the blurred image back to the original image
+  for (int y = 0; y < img->height; y++) {
+    for (int x = 0; x < img->width; x++) {
+      uint8 pixel = ImageGetPixel(tempImg, x, y);
+      ImageSetPixel(img, x, y, pixel);
+    }
+  }
+  
+  // Free the memory allocated for the temporary image
+  ImageDestroy(&tempImg);
 }
-
