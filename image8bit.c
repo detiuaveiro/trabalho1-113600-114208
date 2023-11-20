@@ -605,7 +605,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       uint8 level2 = ImageGetPixel(img2, j, i);
       
       // Blend the pixel levels using the alpha value
-      uint8 blendedLevel = (uint8)(level1 * (1 - alpha) + level2 * alpha);
+      uint8 blendedLevel = (uint8)(level1 * (1 - alpha) + level2 * alpha + 0.5);
       
       // Set the blended pixel in img1 at the corresponding position
       ImageSetPixel(img1, x + j, y + i, blendedLevel);
