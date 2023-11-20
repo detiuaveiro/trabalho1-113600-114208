@@ -573,7 +573,18 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
+  
   // Insert your code here!
+  for (int i = 0; i < img2->height; i++) {
+    for (int j = 0; j < img2->width; j++) {
+      // Get the pixel level from img2
+      uint8 level = ImageGetPixel(img2, j, i);
+      
+      // Set the pixel in img1 at the corresponding position
+      ImageSetPixel(img1, x + j, y + i, level);
+    }
+  }
+  
 }
 
 /// Blend an image into a larger image.
@@ -586,7 +597,22 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
+  
   // Insert your code here!
+  
+  for (int i = 0; i < img2->height; i++) {
+    for (int j = 0; j < img2->width; j++) {
+      // Get the pixel levels from img1 and img2
+      uint8 level1 = ImageGetPixel(img1, x + j, y + i);
+      uint8 level2 = ImageGetPixel(img2, j, i);
+      
+      // Blend the pixel levels using the alpha value
+      uint8 blendedLevel = (uint8)(level1 * (1 - alpha) + level2 * alpha);
+      
+      // Set the blended pixel in img1 at the corresponding position
+      ImageSetPixel(img1, x + j, y + i, blendedLevel);
+    }
+  }
 }
 
 /// Compare an image to a subimage of a larger image.
