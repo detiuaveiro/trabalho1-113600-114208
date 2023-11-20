@@ -172,6 +172,19 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   assert (height >= 0);
   assert (0 < maxval && maxval <= PixMax);
   // Insert your code here!
+  Image image = (Image) malloc(sizeof(Image));
+
+  if (image == NULL) {
+    perror("ImageCreate");
+    exit(2);
+  }
+
+  image->width = width;
+  image->height = height;
+  image->maxval = (int)maxval; 
+  image->pixel = maxval;
+
+  return image;
 }
 
 /// Destroy the image pointed to by (*imgp).
@@ -181,7 +194,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 /// Should never fail, and should preserve global errno/errCause.
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
+
   // Insert your code here!
+  free(imgp);
+  *imgp = NULL;
 }
 
 
