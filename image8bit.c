@@ -404,17 +404,13 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 void ImageNegative(Image img) { ///
   assert (img != NULL);
 
-
-
-
-
-  /*for (int y = 0; y < img->height; y++) {
+  for (int y = 0; y < img->height; y++) {
     for (int x = 0; x < img->width; x++) {
       uint8 level = ImageGetPixel(img, x, y);
       level = img->maxval - level; // Invert the pixel level
       ImageSetPixel(img, x, y, level);
     }
-  }*/
+  }
 }
 
 /// Apply threshold to image.
