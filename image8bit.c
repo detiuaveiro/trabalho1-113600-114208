@@ -24,7 +24,6 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include "instrumentation.h"
 
 // The data structure
@@ -445,7 +444,7 @@ void ImageBrighten(Image img, double factor) { ///
   for (int y = 0; y < img->height; y++) {
     for (int x = 0; x < img->width; x++) {
       uint8 level = ImageGetPixel(img, x, y);
-      level = (uint8)round(level * factor); // Multiply pixel level by factor
+      level = (uint8)(level * factor + 0.5); // Multiply pixel level by factor
       if (level > img->maxval) {
         level = img->maxval; // Saturate at maxval
       }
