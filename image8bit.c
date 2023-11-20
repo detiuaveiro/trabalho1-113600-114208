@@ -456,18 +456,21 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
-  Image rotatedImg = ImageCreate(img->height, img->width, img->maxval);
+  
+  // Create a new image with rotated dimensions
+  Image rotatedImg = ImageCreate(img->width, img->height, img->maxval);
   
   for (int y = 0; y < img->height; y++) {
     for (int x = 0; x < img->width; x++) {
+      // Get the pixel level from the original image
       uint8 level = ImageGetPixel(img, x, y);
-      ImageSetPixel(rotatedImg, y, img->width + x - 1, level);
+      
+      // Set the pixel in the rotated image
+      ImageSetPixel(rotatedImg, img->height - y, x, level);
     }
   }
   
   return rotatedImg;
-}
 }
 
 /// Mirror an image = flip left-right.
@@ -477,11 +480,31 @@ Image ImageRotate(Image img) { ///
 /// On success, a new image is returned.
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
+/// Mirror an image = flip left-right.
+/// Returns a mirrored version of the image.
+/// Ensures: The original img is not modified.
+/// 
+/// On success, a new image is returned.
+/// (The caller is responsible for destroying the returned image!)
+/// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
+  
+  // Create a new image with the same dimensions as the original image
+  Image mirroredImg = ImageCreate(img->width, img->height, img->maxval);
+  
+  for (int y = 0; y < img->height; y++) {
+    for (int x = 0; x < img->width; x++) {
+      // Get the pixel level from the original image
+      uint8 level = ImageGetPixel(img, x, y);
+      
+      // Set the pixel in the mirrored image
+      ImageSetPixel(mirroredImg, img->width - x, y, level);
+    }
+  }
+  
+  return mirroredImg;
 }
-
 /// Crop a rectangular subimage from img.
 /// The rectangle is specified by the top left corner coords (x, y) and
 /// width w and height h.
