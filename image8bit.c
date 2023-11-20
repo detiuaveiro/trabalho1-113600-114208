@@ -629,7 +629,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   int match = ImageCompare(subImg, img2);
 
   // Free the memory allocated for the cropped subimage
-  Free(subImg);
+  free(subImg);
 
   return match;
 }
