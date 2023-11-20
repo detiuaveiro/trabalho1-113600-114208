@@ -444,7 +444,7 @@ void ImageBrighten(Image img, double factor) { ///
   for (int y = 0; y < img->height; y++) {
     for (int x = 0; x < img->width; x++) {
       uint8 level = ImageGetPixel(img, x, y);
-      level = (uint8)(level * factor + 0.5); // Multiply pixel level by factor
+      level = (uint8)(int)(level * factor + 0.5); // Multiply pixel level by factor
       if (level > img->maxval) {
         level = img->maxval; // Saturate at maxval
       }
@@ -605,7 +605,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       uint8 level2 = ImageGetPixel(img2, j, i);
       
       // Blend the pixel levels using the alpha value
-      uint8 blendedLevel = (uint8)(level1 * (1 - alpha) + level2 * alpha + 0.5);
+      uint8 blendedLevel = (uint8)(int)(level1 * (1 - alpha) + level2 * alpha + 0.5);
       
       // Set the blended pixel in img1 at the corresponding position
       ImageSetPixel(img1, x + j, y + i, blendedLevel);
