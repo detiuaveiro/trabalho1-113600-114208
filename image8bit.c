@@ -202,8 +202,11 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
   // Insert your code here!
-  //free((*imgp)->pixel);
+  assert((*imgp != NULL));
+  free((*imgp)->pixel);
+  (*imgp)->pixel = NULL;
   free(*imgp);
+
   *imgp = NULL;
 }
 
@@ -316,6 +319,13 @@ int ImageMaxval(Image img) { ///
 /// *max is set to the maximum.
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
+  // Insert your code here!
+  assert (min != NULL);
+  assert (max != NULL);
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
+
   *min = img->pixel[0];
   *max = img->pixel[0];
   for (int i = 1; i < img->width * img->height; i++) {
@@ -338,6 +348,10 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
+   
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
   assert (w >= 0 && h >= 0); // Ensure width and height are non-negative
 
   // Check if the top-left corner (x, y) is inside the image
@@ -367,6 +381,13 @@ static inline int G(Image img, int x, int y) {
   int index;
 
   // Insert your code here!
+  assert (img != NULL);
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
+  assert (0 <= x && x < img->width);
+  assert (0 <= y && y < img->height);
+
   index = y * img->width + x;
 
   assert (0 <= index && index < img->width*img->height);
@@ -402,7 +423,11 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 /// This transforms dark pixels to light pixels and vice-versa,
 /// resulting in a "photographic negative" effect.
 void ImageNegative(Image img) { ///
-  assert (img != NULL);
+    assert (img != NULL);
+  // Insert your code here!
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
 
   for (int y = 0; y < img->height; y++) {
     for (int x = 0; x < img->width; x++) {
@@ -479,6 +504,11 @@ void ImageBrighten(Image img, double factor) { ///
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
+  // Insert your code here!
+
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
   
   // Create a new image with rotated dimensions
   Image rotatedImg = ImageCreate(img->width, img->height, img->maxval);
@@ -511,7 +541,12 @@ Image ImageRotate(Image img) { ///
 /// (The caller is responsible for destroying the returned image!)
 /// On failure, returns NULL and errno/errCause are set accordingly.
 Image ImageMirror(Image img) { ///
-  assert (img != NULL);
+    assert (img != NULL);
+  // Insert your code here!
+
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
   
   // Create a new image with the same dimensions as the original image
   Image mirroredImg = ImageCreate(img->width, img->height, img->maxval);
@@ -545,6 +580,10 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
   assert (ImageValidRect(img, x, y, w, h));
   // Insert your code here!
 
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
+
   // Create a new image with cropped dimensions
   Image croppedImg = ImageCreate(w, h, img->maxval);
   
@@ -572,8 +611,15 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  
   // Insert your code here!
+  assert (img1->pixel != NULL);
+  assert (img2->pixel != NULL);
+  assert (img1->width > 0);
+  assert (img1->height > 0);
+  assert (img2->width > 0);
+  assert (img2->height > 0);
+   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
+
   for (int i = 0; i < img2->height; i++) {
     for (int j = 0; j < img2->width; j++) {
       // Get the pixel level from img2
@@ -596,8 +642,15 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, img2->width, img2->height));
-  
   // Insert your code here!
+
+  assert (img1->pixel != NULL);
+  assert (img2->pixel != NULL);
+  assert (img1->width > 0);
+  assert (img1->height > 0);
+  assert (img2->width > 0);
+  assert (img2->height > 0);
+  assert (alpha >= 0.0 && alpha <= 1.0);
 
   for (int i = 0; i < img2->height; i++) {
     for (int j = 0; j < img2->width; j++) {
@@ -621,6 +674,15 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
+  // Insert your code here!
+  assert (img1->pixel != NULL);
+  assert (img2->pixel != NULL);
+  assert (img1->width > 0);
+  assert (img1->height > 0);
+  assert (img2->width > 0);
+  assert (img2->height > 0);
+  assert (x + img2->width <= img1->width);
+  assert (y + img2->height <= img1->height);
   
   // Iterate over the pixels of img2
   for (int i = 0; i < img2->height; i++) {
@@ -646,6 +708,15 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
 int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
   assert (img1 != NULL);
   assert (img2 != NULL);
+  // Insert your code here!
+  assert (img1->pixel != NULL);
+  assert (img2->pixel != NULL);
+  assert (img1->width > 0);
+  assert (img1->height > 0);
+  assert (img2->width > 0);
+  assert (img2->height > 0);
+  assert (px != NULL);
+  assert (py != NULL);
   
   
   // Iterate over the pixels of img1
@@ -672,11 +743,17 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
+  // Insert your code here!
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
+  assert (img->pixel != NULL);
+  assert (img->width > 0);
+  assert (img->height > 0);
   
   // Create a temporary image to store the blurred result
   Image tempImg = ImageCreate(img->width, img->height, img->maxval);
+  assert (tempImg != NULL);
+  assert (tempImg->pixel != NULL);
   
   // Iterate over the pixels of the image
   for (int y = 0; y < img->height; y++) {
