@@ -606,7 +606,7 @@ void ImageBlend(Image img1, int x, int y, Image img2, double alpha) { ///
       uint8 level2 = ImageGetPixel(img2, j, i);
       
       // Blend the pixel levels using the alpha value
-      uint8 blendedLevel = (uint8)round(level1 * (1 - alpha) + level2 * alpha);
+      uint8 blendedLevel = (uint8)round((level1 * (1 - alpha)) + (level2 * alpha));
       
       // Set the blended pixel in img1 at the corresponding position
       ImageSetPixel(img1, x + j, y + i, blendedLevel);
@@ -622,8 +622,16 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidPos(img1, x, y));
   
-  
-  
+  // Crop the subimage from img1 using ImageCrop function
+  Image subImg = ImageCrop(img1, x, y, img2->width, img2->height);
+
+  // Compare the cropped subimage with img2
+  int match = ImageCompare(subImg, img2);
+
+  // Free the memory allocated for the cropped subimage
+  Free(subImg);
+
+  return match;
 }
 
 /// Locate a subimage inside another image.
@@ -644,9 +652,8 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
+  // Insert your code here!
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
-  
-
 }
 
