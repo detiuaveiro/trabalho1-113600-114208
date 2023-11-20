@@ -181,7 +181,7 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 
   image->width = width;
   image->height = height;
-  image->maxval = (int)maxval; 
+  image->maxval = maxval; 
   image->pixel = (uint8 *)malloc(width*height*sizeof(uint8));
 
   if (image->pixel == NULL) {
@@ -368,7 +368,7 @@ static inline int G(Image img, int x, int y) {
 
   // Insert your code here!
   index = y * img->width + x;
-  
+
   assert (0 <= index && index < img->width*img->height);
   return index;
 }
@@ -403,7 +403,18 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 /// resulting in a "photographic negative" effect.
 void ImageNegative(Image img) { ///
   assert (img != NULL);
-  // Insert your code here!
+
+
+
+
+
+  /*for (int y = 0; y < img->height; y++) {
+    for (int x = 0; x < img->width; x++) {
+      uint8 level = ImageGetPixel(img, x, y);
+      level = img->maxval - level; // Invert the pixel level
+      ImageSetPixel(img, x, y, level);
+    }
+  }*/
 }
 
 /// Apply threshold to image.
