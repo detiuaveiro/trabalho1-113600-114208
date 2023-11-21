@@ -766,19 +766,31 @@ void ImageBlur(Image img, int dx, int dy) { ///
     }
   }
 
-  // Blur the image using the integral image
-  for (int y = 0; y < img->height; y++) {
-    for (int x = 0; x < img->width; x++) {
-      int x1 = max(0, x - dx);
-      int x2 = min(img->width, x + dx + 1);
-      int y1 = max(0, y - dy);
-      int y2 = min(img->height, y + dy + 1);
-      int sum = integralImg[y2 * (img->width + 1) + x2]
-        - integralImg[y1 * (img->width + 1) + x2]
-        - integralImg[y2 * (img->width + 1) + x1]
-        + integralImg[y1 * (img->width + 1) + x1];
-      int count = (x2 - x1) * (y2 - y1);
+  // Iterate over the pixels of the image 
+
+  for (int y = 0; y < img->height; y++) { 
+    for (int x = 0; x < img->width; x++) { 
+    
+      // Calculate the sum of pixel values in the neighborhood 
+      int sum = 0; int count = 0; 
+      for (int i = -dy; i <= dy; i++) { 
+        for (int j = -dx; j <= dx; j++) { 
+          // Calculate the coordinates of the current pixel 
+          int nx = x + j; int ny = y + i;
+
+                // Check if the pixel is within the image boundaries
+          if (nx >= 0 && nx < img->width && ny >= 0 && ny < img->height) {
+            // Add the pixel value to the sum
+            sum += ImageGetPixel(img, nx, ny);
+            count++;
+          }
+        }
+      }
+  
+      // Calculate the average pixel value
       uint8 average = (uint8)round((sum / (double)count));
+      
+      // Set the average pixel value in the temporary image
       ImageSetPixel(tempImg, x, y, average);
     }
   }
