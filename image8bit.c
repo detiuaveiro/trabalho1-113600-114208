@@ -755,42 +755,43 @@ void ImageBlur(Image img, int dx, int dy) { ///
   assert (tempImg != NULL);
   assert (tempImg->pixel != NULL);
   
-  // Iterate over the pixels of the image
+  // Create the integral image
+  int* integralImg = (int*)calloc((img->width + 1) * (img->height + 1), sizeof(int));
+  for (int y = 1; y <= img->height; y++) {
+    for (int x = 1; x <= img->width; x++) {
+      integralImg[y * (img->width + 1) + x] = ImageGetPixel(img, x - 1, y - 1)
+        + integralImg[(y - 1) * (img->width + 1) + x]
+        + integralImg[y * (img->width + 1) + x - 1]
+        - integralImg[(y - 1) * (img->width + 1) + x - 1];
+    }
+  }
+
+  // Blur the image using the integral image
   for (int y = 0; y < img->height; y++) {
     for (int x = 0; x < img->width; x++) {
-      // Calculate the sum of pixel values in the neighborhood
-      int sum = 0;
-      int count = 0;
-      for (int i = -dy; i <= dy; i++) {
-        for (int j = -dx; j <= dx; j++) {
-          // Calculate the coordinates of the current pixel
-          int nx = x + j;
-          int ny = y + i;
-          
-          // Check if the pixel is within the image boundaries
-          if (nx >= 0 && nx < img->width && ny >= 0 && ny < img->height) {
-            // Add the pixel value to the sum
-            sum += ImageGetPixel(img, nx, ny);
-            count++;
-          }
-        }
-      }
-      
-      // Calculate the average pixel value
+      int x1 = max(0, x - dx);
+      int x2 = min(img->width, x + dx + 1);
+      int y1 = max(0, y - dy);
+      int y2 = min(img->height, y + dy + 1);
+      int sum = integralImg[y2 * (img->width + 1) + x2]
+        - integralImg[y1 * (img->width + 1) + x2]
+        - integralImg[y2 * (img->width + 1) + x1]
+        + integralImg[y1 * (img->width + 1) + x1];
+      int count = (x2 - x1) * (y2 - y1);
       uint8 average = (uint8)round((sum / (double)count));
-      
-      // Set the average pixel value in the temporary image
       ImageSetPixel(tempImg, x, y, average);
     }
   }
+
+  // Free the integral image
+  free(integralImg);
+
+
+  free(img->pixel);
   
-  // Copy the blurred image back to the original image
-  for (int y = 0; y < img->height; y++) {
-    for (int x = 0; x < img->width; x++) {
-      uint8 pixel = ImageGetPixel(tempImg, x, y);
-      ImageSetPixel(img, x, y, pixel);
-    }
-  }
+  img->pixel = tempImg->pixel;
+
+  tempImg->pixel = NULL;
   
   // Free the memory allocated for the temporary image
   ImageDestroy(&tempImg);
