@@ -9,11 +9,11 @@
 
 int main(void)
 {   
-    Image img = ImageLoad("pgm/small/art3_222x217.pgm");
+    Image img = ImageLoad("pgm/medium/airfield-05_640x480.pgm");
 
     double start_time = cpu_time();
 
-    ImageBlur(img, 3, 3);
+    ImageBlur(img, 640, 480);
 
     double finish_time = cpu_time();
 

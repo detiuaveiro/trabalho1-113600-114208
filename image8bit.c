@@ -743,55 +743,83 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 /// [x-dx, x+dx]x[y-dy, y+dy].
 /// The image is changed in-place.
 void ImageBlur(Image img, int dx, int dy) { ///
-  // Insert your code here!
   assert (img != NULL);
   assert (dx >= 0 && dy >= 0);
   assert (img->pixel != NULL);
   assert (img->width > 0);
   assert (img->height > 0);
   
-  // Create a temporary image to store the blurred result
-  Image tempImg = ImageCreate(img->width, img->height, img->maxval);
-  assert (tempImg != NULL);
-  assert (tempImg->pixel != NULL);
-
-  // Iterate over the pixels of the image 
-
-  for (int y = 0; y < img->height; y++) { 
-    for (int x = 0; x < img->width; x++) { 
-    
-      // Calculate the sum of pixel values in the neighborhood 
-      int sum = 0; int count = 0; 
-      for (int i = -dy; i <= dy; i++) { 
-        for (int j = -dx; j <= dx; j++) { 
-          // Calculate the coordinates of the current pixel 
-          int nx = x + j; int ny = y + i;
-
-                // Check if the pixel is within the image boundaries
-          if (nx >= 0 && nx < img->width && ny >= 0 && ny < img->height) {
-            // Add the pixel value to the sum
-            sum += ImageGetPixel(img, nx, ny);
-            count++;
-          }
-        }
-      }
+  // Create an auxiliary matrix to store the accumulated sum of pixel values
+  int width = img->width;
+  int height = img->height;
+  int** sumMatrix = (int**)malloc(height * sizeof(int*));
+  for (int i = 0; i < height; i++) {
+    sumMatrix[i] = (int*)malloc(width * sizeof(int));
+  }
   
-      // Calculate the average pixel value
-      uint8 average = (uint8)round((sum / (double)count));
-      
-      // Set the average pixel value in the temporary image
-      ImageSetPixel(tempImg, x, y, average);
+  // Calculate the accumulated sum of pixel values
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int sum = ImageGetPixel(img, j, i);
+      if (i > 0) {
+        sum += sumMatrix[i - 1][j];
+      }
+      if (j > 0) {
+        sum += sumMatrix[i][j - 1];
+      }
+      if (i > 0 && j > 0) {
+        sum -= sumMatrix[i - 1][j - 1];
+      }
+      sumMatrix[i][j] = sum;
     }
   }
-
-
-
-  free(img->pixel);
   
-  img->pixel = tempImg->pixel;
-
-  tempImg->pixel = NULL;
+  // Apply the mean filter to blur the image
+  for (int i = 0; i < height; i++) {
+    for (int j = 0; j < width; j++) {
+      int x1 = j - dx;
+      int x2 = j + dx;
+      int y1 = i - dy;
+      int y2 = i + dy;
+      
+      // Adjust the rectangle boundaries to stay within the image bounds
+      if (x1 < 0) {
+        x1 = 0;
+      }
+      if (x2 >= width) {
+        x2 = width - 1;
+      }
+      if (y1 < 0) {
+        y1 = 0;
+      }
+      if (y2 >= height) {
+        y2 = height - 1;
+      }
+      
+      // Calculate the sum of pixel values within the rectangle
+      int sum = sumMatrix[y2][x2];
+      if (x1 > 0) {
+        sum -= sumMatrix[y2][x1 - 1];
+      }
+      if (y1 > 0) {
+        sum -= sumMatrix[y1 - 1][x2];
+      }
+      if (x1 > 0 && y1 > 0) {
+        sum += sumMatrix[y1 - 1][x1 - 1];
+      }
+      
+      // Calculate the mean of pixel values within the rectangle
+      int count = (x2 - x1 + 1) * (y2 - y1 + 1);
+      int mean = sum / count;
+      
+      // Set the mean value as the new pixel value in the image
+      ImageSetPixel(img, j, i, mean);
+    }
+  }
   
-  // Free the memory allocated for the temporary image
-  ImageDestroy(&tempImg);
+  // Free the memory allocated for the sum matrix
+  for (int i = 0; i < height; i++) {
+    free(sumMatrix[i]);
+  }
+  free(sumMatrix);
 }
