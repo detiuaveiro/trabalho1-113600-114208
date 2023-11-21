@@ -754,17 +754,6 @@ void ImageBlur(Image img, int dx, int dy) { ///
   Image tempImg = ImageCreate(img->width, img->height, img->maxval);
   assert (tempImg != NULL);
   assert (tempImg->pixel != NULL);
-  
-  // Create the integral image
-  int* integralImg = (int*)calloc((img->width + 1) * (img->height + 1), sizeof(int));
-  for (int y = 1; y <= img->height; y++) {
-    for (int x = 1; x <= img->width; x++) {
-      integralImg[y * (img->width + 1) + x] = ImageGetPixel(img, x - 1, y - 1)
-        + integralImg[(y - 1) * (img->width + 1) + x]
-        + integralImg[y * (img->width + 1) + x - 1]
-        - integralImg[(y - 1) * (img->width + 1) + x - 1];
-    }
-  }
 
   // Iterate over the pixels of the image 
 
@@ -795,8 +784,6 @@ void ImageBlur(Image img, int dx, int dy) { ///
     }
   }
 
-  // Free the integral image
-  free(integralImg);
 
 
   free(img->pixel);
