@@ -176,8 +176,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   Image image = (Image) malloc(sizeof(struct image));
 
 
-  if (image == NULL) {
-    perror("ImageCreate");
+  if (!check(image != NULL, "ImageCreate failed")) {
+    errsave = errno;
+    perror(ImageErrMsg());
+    errno = errsave;
     return NULL;
   }
 
@@ -186,11 +188,14 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   image->maxval = maxval; 
   image->pixel = (uint8 *)calloc(width*height, sizeof(uint8));
 
-  if (image->pixel == NULL) {
+  if (!check(image->pixel != NULL, "PixelCreate failed")) {
     free(image);
-    perror("PixelCreate");
+    errsave = errno;
+    perror(ImageErrMsg());
+    errno = errsave;
     return NULL;
   }
+
   return image;
 }
 
@@ -202,12 +207,32 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
 void ImageDestroy(Image* imgp) { ///
   assert (imgp != NULL);
   // Insert your code here!
-  assert((*imgp != NULL));
-  free((*imgp)->pixel);
-  (*imgp)->pixel = NULL;
-  free(*imgp);
 
-  *imgp = NULL;
+  if (*imgp != NULL) {
+    // Preserve the value of errno
+    errsave = errno;
+
+    // Free the pixel array
+    free((*imgp)->pixel);
+    (*imgp)->pixel = NULL;
+
+    // Check if the pixel array was freed successfully
+    if (!check((*imgp)->pixel == NULL, "Pixel array free failed")) {
+      perror(ImageErrMsg());
+      errno = errsave;
+    }
+
+    // Free the image
+    free(*imgp);
+
+    // Check if the image was freed successfully
+    if (!check(*imgp == NULL, "Image free failed")) {
+      perror(ImageErrMsg());
+      errno = errsave;
+    }
+
+    *imgp = NULL;
+  }
 }
 
 
@@ -348,19 +373,30 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
+
+  // Preserve the value of errno
+  errsave = errno;
    
   assert (img->pixel != NULL);
-  assert (img->width > 0);
-  assert (img->height > 0);
+  assert (ImageWidth(img) > 0);
+  assert (ImageHeight(img) > 0);
   assert (w >= 0 && h >= 0); // Ensure width and height are non-negative
 
   // Check if the top-left corner (x, y) is inside the image
   if (!ImageValidPos(img, x, y)) {
+    if (!check(0, "Top-left corner is outside the image")) {
+      perror(ImageErrMsg());
+      errno = errsave;
+    }
     return 0;
   }
 
   // Check if the bottom-right corner (x + w, y + h) is inside the image
   if (!ImageValidPos(img, x + w - 1, y + h - 1)) {
+    if (!check(0, "Bottom-right corner is outside the image")) {
+      perror(ImageErrMsg());
+      errno = errsave;
+    }
     return 0;
   }
 
@@ -423,7 +459,7 @@ void ImageSetPixel(Image img, int x, int y, uint8 level) { ///
 /// This transforms dark pixels to light pixels and vice-versa,
 /// resulting in a "photographic negative" effect.
 void ImageNegative(Image img) { ///
-    assert (img != NULL);
+  assert (img != NULL);
   // Insert your code here!
   assert (img->pixel != NULL);
   assert (img->width > 0);
@@ -816,6 +852,12 @@ void ImageBlur(Image img, int dx, int dy) { ///
       ImageSetPixel(img, j, i, mean);
     }
   }
+
+
+
+  free(img->pixel);
+  
+
   
   // Free the memory allocated for the sum matrix
   for (int i = 0; i < height; i++) {
