@@ -189,10 +189,10 @@ Image ImageCreate(int width, int height, uint8 maxval) { ///
   image->pixel = (uint8 *)calloc(width*height, sizeof(uint8));
 
   if (!check(image->pixel != NULL, "PixelCreate failed")) {
-    free(image);
     errsave = errno;
     perror(ImageErrMsg());
     errno = errsave;
+    free(image);
     return NULL;
   }
 
@@ -210,28 +210,14 @@ void ImageDestroy(Image* imgp) { ///
 
   if (*imgp != NULL) {
     // Preserve the value of errno
-    errsave = errno;
-
     // Free the pixel array
     free((*imgp)->pixel);
     (*imgp)->pixel = NULL;
 
-    // Check if the pixel array was freed successfully
-    if (!check((*imgp)->pixel == NULL, "Pixel array free failed")) {
-      perror(ImageErrMsg());
-      errno = errsave;
-    }
-
     // Free the image
     free(*imgp);
-
-    // Check if the image was freed successfully
-    if (!check(*imgp != NULL, "Image free failed")) {
-      perror(ImageErrMsg());
-      errno = errsave;
-    }
-
     *imgp = NULL;
+
   }
 }
 
@@ -348,7 +334,6 @@ int ImageMaxval(Image img) { ///
 void ImageStats(Image img, uint8* min, uint8* max) { ///
   assert (img != NULL);
   // Insert your code here!
-
   assert (min != NULL);
   assert (max != NULL);
 
@@ -357,7 +342,7 @@ void ImageStats(Image img, uint8* min, uint8* max) { ///
 
   *min = img->pixel[0];
   *max = img->pixel[0];
-  for (int i = 1; i < width* height; i++) {
+  for (int i = 1; i < width * height; i++) {
     if (img->pixel[i] < *min) {
       *min = img->pixel[i];
     }
@@ -377,27 +362,16 @@ int ImageValidPos(Image img, int x, int y) { ///
 int ImageValidRect(Image img, int x, int y, int w, int h) { ///
   assert (img != NULL);
   // Insert your code here!
-
-  // Preserve the value of errno
-  errsave = errno;
    
   assert (w >= 0 && h >= 0); // Ensure width and height are non-negative
 
   // Check if the top-left corner (x, y) is inside the image
   if (!ImageValidPos(img, x, y)) {
-    if (!check(0, "Top-left corner is outside the image")) {
-      perror(ImageErrMsg());
-      errno = errsave;
-    }
     return 0;
   }
 
   // Check if the bottom-right corner (x + w, y + h) is inside the image
   if (!ImageValidPos(img, x + w - 1, y + h - 1)) {
-    if (!check(0, "Bottom-right corner is outside the image")) {
-      perror(ImageErrMsg());
-      errno = errsave;
-    }
     return 0;
   }
 
@@ -425,15 +399,7 @@ static inline int G(Image img, int x, int y) {
   int height = ImageHeight(img);
 
 
-  index = y * width + x;
-
-  if (!check(0 <= index && index < width*height, "Index out of bounds")) {
-    perror(ImageErrMsg());
-    errno = errsave;
-    return -1; // Return an invalid index
-  }
-
-  return index;
+  return y * width + x;;
 }
 
 /// Get the pixel (level) at position (x,y).
@@ -483,7 +449,6 @@ void ImageNegative(Image img) { ///
 void ImageThreshold(Image img, uint8 thr) { ///
   assert (img != NULL);
   // Insert your code here!
-  int errsave = errno;
 
 
   for (int y = 0; y < ImageHeight(img); y++) {
@@ -496,9 +461,6 @@ void ImageThreshold(Image img, uint8 thr) { ///
       }
     }
   }
-
-  // Restore the value of errno
-  errno = errsave;
 }
 
 /// Brighten image by a factor.
@@ -521,9 +483,6 @@ void ImageBrighten(Image img, double factor) { ///
       ImageSetPixel(img, x, y, level);
     }
   }
-
-  // Restore the value of errno
-  errno = errsave;
 }
 
 
@@ -551,7 +510,6 @@ void ImageBrighten(Image img, double factor) { ///
 Image ImageRotate(Image img) { ///
   assert (img != NULL);
   // Insert your code here!
-  int errsave = errno;
 
   int width = ImageWidth(img);
   int height = ImageHeight(img);
@@ -560,6 +518,13 @@ Image ImageRotate(Image img) { ///
   
   // Create a new image with rotated dimensions
   Image rotatedImg = ImageCreate(width, height, maxval);
+
+  if (!check(rotatedImg != NULL, "ImageCreate failed")) {
+    errsave = errno;
+    perror(ImageErrMsg());
+    errno = errsave;
+    return NULL;
+  }
   
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
@@ -571,8 +536,6 @@ Image ImageRotate(Image img) { ///
     }
   }
 
-  // Restore the value of errno
-  errno = errsave;
   
   return rotatedImg;
 }
@@ -604,7 +567,13 @@ Image ImageMirror(Image img) { ///
   
   // Create a new image with the same dimensions as the original image
   Image mirroredImg = ImageCreate(width, height, maxval);
-  
+  if (!check(mirroredImg != NULL, "ImageCreate failed")) {
+    errsave = errno;
+    perror(ImageErrMsg());
+    errno = errsave;
+    return NULL;
+  }
+
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       // Get the pixel level from the original image
@@ -638,6 +607,13 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
 
   // Create a new image with cropped dimensions
   Image croppedImg = ImageCreate(w, h, ImageMaxval(img));
+  if (check(croppedImg != NULL, "ImageCreate failed")) {
+    errsave = errno;
+    perror(ImageErrMsg());
+    errno = errsave;
+    return NULL;
+  }
+  
   
   for (int i = 0; i < h; i++) {
     for (int j = 0; j < w; j++) {
@@ -664,8 +640,6 @@ void ImagePaste(Image img1, int x, int y, Image img2) { ///
   assert (img2 != NULL);
   assert (ImageValidRect(img1, x, y, ImageWidth(img2), ImageHeight(img2)));
   // Insert your code here!
-
-
 
 
   for (int i = 0; i < ImageHeight(img2); i++) {

@@ -15,12 +15,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "Usage: %s <image_file> <operation> <parameters>\n", argv[0]);
         return 1;
     }
-
-    for (int i = 0; i < argc; i++)
-    {
-        printf("%d: %s\n",i, argv[i]);
-    
-    }
     
 
 
