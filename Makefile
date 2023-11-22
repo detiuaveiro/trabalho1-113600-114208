@@ -9,9 +9,9 @@ CFLAGS = -Wall -O2 -g
 
 LDLIBS = -lm 
 
-PROGS = imageTool imageTest
+PROGS = imageTool imageTest testTime
 
-TESTS = test1 test2 test3 test4 test5 test6 test7 test8 test9
+TESTS = test1 test2 test3 test4 test5 test6 test7 test8 test9 test10
 
 # Default rule: make all programs
 all: $(PROGS)
@@ -23,6 +23,11 @@ imageTest.o: image8bit.h instrumentation.h
 imageTool: imageTool.o image8bit.o instrumentation.o error.o
 
 imageTool.o: image8bit.h instrumentation.h
+
+testTime:  testTime.o image8bit.o instrumentation.o error.o
+
+testTime.o:  image8bit.h instrumentation.h
+
 
 
 
@@ -76,6 +81,15 @@ test8: $(PROGS) setup
 test9: $(PROGS) setup
 	./imageTool test/original.pgm blur 7,7 save blur.pgm
 	cmp blur.pgm test/blur.pgm
+
+test10: $(PROGS) setup
+	./testTime pgm/large/airfield-05_1600x1200.pgm blur 3,3 save airfield_blur.pgm
+
+
+test11: $(PROGS) setup
+	./testTime test/paste.pgm locate test/small.pgm
+
+
 
 
 
