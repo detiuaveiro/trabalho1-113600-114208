@@ -24,6 +24,8 @@ imageTool: imageTool.o image8bit.o instrumentation.o error.o
 
 imageTool.o: image8bit.h instrumentation.h
 
+
+
 # Rule to make any .o file dependent upon corresponding .h file
 %.o: %.h
 
@@ -74,6 +76,8 @@ test8: $(PROGS) setup
 test9: $(PROGS) setup
 	./imageTool test/original.pgm blur 7,7 save blur.pgm
 	cmp blur.pgm test/blur.pgm
+
+
 
 .PHONY: tests
 tests: $(TESTS)
