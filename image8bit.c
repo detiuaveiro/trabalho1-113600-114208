@@ -389,14 +389,12 @@ int ImageValidRect(Image img, int x, int y, int w, int h) { ///
 // This internal function is used in ImageGetPixel / ImageSetPixel. 
 // The returned index must satisfy (0 <= index < img->width*img->height)
 static inline int G(Image img, int x, int y) {
-  int index;
 
   // Insert your code here!
   assert (img != NULL);
   assert (ImageValidPos(img, x, y));
 
   int width = ImageWidth(img);
-  int height = ImageHeight(img);
 
 
   return y * width + x;;
@@ -607,7 +605,7 @@ Image ImageCrop(Image img, int x, int y, int w, int h) { ///
 
   // Create a new image with cropped dimensions
   Image croppedImg = ImageCreate(w, h, ImageMaxval(img));
-  if (check(croppedImg != NULL, "ImageCreate failed")) {
+  if (!check(croppedImg != NULL, "ImageCreate failed")) {
     errsave = errno;
     perror(ImageErrMsg());
     errno = errsave;
