@@ -148,11 +148,15 @@ void ImageInit(void) { ///
   InstrCalibrate();
   InstrName[0] = "pixmem";  // InstrCount[0] will count pixel array acesses
   // Name other counters here...
+  InstrName[1] = "comp";
+  InstrName[2] = "sums";
   
 }
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
+#define COMP InstrCount[1]
+#define SUMS InstrCount[2]
 // Add more macros here...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
@@ -701,8 +705,10 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       
       // Compare the pixel levels
       if (level1 != level2) {
+        COMP++;
         return 0; // Pixels don't match
       }
+      COMP++;
     }
   }
   
@@ -729,11 +735,14 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
         // Set the matching position in vars (*px, *py)
         *px = x;
         *py = y;
+
+        printf("Number of comparations: %d\n", COMP);
         return 1; // Match found
       }
     }
   }
   
+  printf("Number of comparations: %d\n", COMP);
   return 0; // No match found
 }
 
@@ -769,12 +778,15 @@ void ImageBlur(Image img, int dx, int dy) { ///
     for (int j = 0; j < width; j++) {
       int sum = ImageGetPixel(img, j, i);
       if (i > 0) {
+        SUMS++;
         sum += sumMatrix[i - 1][j];
       }
       if (j > 0) {
+        SUMS++;
         sum += sumMatrix[i][j - 1];
       }
       if (i > 0 && j > 0) {
+        SUMS++;
         sum -= sumMatrix[i - 1][j - 1];
       }
       sumMatrix[i][j] = sum;
@@ -784,6 +796,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
   // Apply the mean filter to blur the image
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
+      SUMS += 4;
       int x1 = j - dx;
       int x2 = j + dx;
       int y1 = i - dy;
@@ -806,12 +819,15 @@ void ImageBlur(Image img, int dx, int dy) { ///
       // Calculate the sum of pixel values within the rectangle
       int sum = sumMatrix[y2][x2];
       if (x1 > 0) {
+        SUMS++;
         sum -= sumMatrix[y2][x1 - 1];
       }
       if (y1 > 0) {
+        SUMS++;
         sum -= sumMatrix[y1 - 1][x2];
       }
       if (x1 > 0 && y1 > 0) {
+        SUMS++;
         sum += sumMatrix[y1 - 1][x1 - 1];
       }
       
@@ -829,4 +845,6 @@ void ImageBlur(Image img, int dx, int dy) { ///
     free(sumMatrix[i]);
   }
   free(sumMatrix);
+
+  printf("Number of Sums: %d\n", SUMS);
 }
