@@ -760,7 +760,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
   int height = ImageHeight(img);
   int** sumMatrix = (int**)malloc(height * sizeof(int*));
 
-  if (dx==0 & dy == 0){
+  if (dx==0 && dy == 0){
     return;
   }
 
