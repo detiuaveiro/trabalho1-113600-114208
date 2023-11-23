@@ -743,6 +743,8 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
 }
 
 
+
+
 /// Filtering
 
 /// Blur an image by a applying a (2dx+1)x(2dy+1) mean filter.
@@ -758,6 +760,10 @@ void ImageBlur(Image img, int dx, int dy) { ///
   int height = ImageHeight(img);
   int** sumMatrix = (int**)malloc(height * sizeof(int*));
 
+  if (dx==0 & dy == 0){
+    return;
+  }
+
   if (!check(sumMatrix != NULL, "sumMatrix failed")) {
     errsave = errno;
     perror(ImageErrMsg());
@@ -767,6 +773,16 @@ void ImageBlur(Image img, int dx, int dy) { ///
 
   for (int i = 0; i < height; i++) {
     sumMatrix[i] = (int*)malloc(width * sizeof(int));
+    if (!check(sumMatrix[i] != NULL, "sumMatrix failed")) {
+      for (int j = 0; j < i; j++) {
+        free(sumMatrix[j]);
+      }
+      free(sumMatrix);
+      errsave = errno;
+      perror(ImageErrMsg());
+      errno = errsave;
+      return;
+    }
   }
   
   // Calculate the accumulated sum of pixel values
@@ -794,8 +810,8 @@ void ImageBlur(Image img, int dx, int dy) { ///
     for (int j = 0; j < width; j++) {
       SUMS += 4;
       int x1 = j - dx;
-      int x2 = j + dx;
       int y1 = i - dy;
+      int x2 = j + dx;
       int y2 = i + dy;
       
       // Adjust the rectangle boundaries to stay within the image bounds
@@ -841,6 +857,4 @@ void ImageBlur(Image img, int dx, int dy) { ///
     free(sumMatrix[i]);
   }
   free(sumMatrix);
-
-
 }
