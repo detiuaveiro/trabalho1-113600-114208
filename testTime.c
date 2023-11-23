@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
 
         double start_time = cpu_time();
         ImageBlur(img, radiusX, radiusY);
+        printf("Number of Sums: %ld\n", SUMS);
         double finish_time = cpu_time();
         double exec_time = finish_time - start_time;
         printf("Execution time: %f\n", exec_time);
@@ -56,6 +57,7 @@ int main(int argc, char *argv[]) {
 
         double start_time = cpu_time();
         int result = ImageLocateSubImage(img, &posX, &posY, subimg);
+        printf("Number of comparations: %ld\n", COMP);
         double finish_time = cpu_time();
         double exec_time = finish_time - start_time;
         printf("Execution time: %f\n", exec_time);

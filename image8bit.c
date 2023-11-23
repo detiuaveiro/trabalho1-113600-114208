@@ -155,8 +155,6 @@ void ImageInit(void) { ///
 
 // Macros to simplify accessing instrumentation counters:
 #define PIXMEM InstrCount[0]
-#define COMP InstrCount[1]
-#define SUMS InstrCount[2]
 // Add more macros here...
 
 // TIP: Search for PIXMEM or InstrCount to see where it is incremented!
@@ -736,13 +734,11 @@ int ImageLocateSubImage(Image img1, int* px, int* py, Image img2) { ///
         *px = x;
         *py = y;
 
-        printf("Number of comparations: %d\n", COMP);
         return 1; // Match found
       }
     }
   }
   
-  printf("Number of comparations: %d\n", COMP);
   return 0; // No match found
 }
 
@@ -846,5 +842,5 @@ void ImageBlur(Image img, int dx, int dy) { ///
   }
   free(sumMatrix);
 
-  printf("Number of Sums: %d\n", SUMS);
+
 }
