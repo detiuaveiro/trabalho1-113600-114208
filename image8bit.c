@@ -700,13 +700,11 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       // Get the pixel levels from img1 and img2
       uint8 level1 = ImageGetPixel(img1, x + j, y + i);
       uint8 level2 = ImageGetPixel(img2, j, i);
-      
+      COMP++;
       // Compare the pixel levels
       if (level1 != level2) {
-        COMP++;
         return 0; // Pixels don't match
       }
-      COMP++;
     }
   }
   
