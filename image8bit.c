@@ -150,6 +150,7 @@ void ImageInit(void) { ///
   // Name other counters here...
   InstrName[1] = "comp";
   InstrName[2] = "sums";
+  InstrName[3] = "mul";
   
 }
 
@@ -817,12 +818,14 @@ void ImageBlur(Image img, int dx, int dy) { ///
         x1 = 0;
       }
       if (x2 >= width) {
+        SUMS++;
         x2 = width - 1;
       }
       if (y1 < 0) {
         y1 = 0;
       }
       if (y2 >= height) {
+        SUMS++;
         y2 = height - 1;
       }
       
@@ -844,6 +847,8 @@ void ImageBlur(Image img, int dx, int dy) { ///
       // Calculate the mean of pixel values within the rectangle
       int count = (x2 - x1 + 1) * (y2 - y1 + 1);
       int mean = round((double)sum / count);
+
+      MUL += 2;
       
       // Set the mean value as the new pixel value in the image
       ImageSetPixel(img, j, i, mean);

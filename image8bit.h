@@ -26,6 +26,7 @@ typedef struct image *Image;
 
 #define COMP InstrCount[1]
 #define SUMS InstrCount[2]
+#define MUL InstrCount[3]
 
 /// Error handling functions
 

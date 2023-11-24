@@ -83,7 +83,8 @@ test9: $(PROGS) setup
 	cmp blur.pgm test/blur.pgm
 
 test10: $(PROGS) setup
-	./testTime pgm/large/airfield-05_1600x1200.pgm blur 7,7 save airfield_blur.pgm
+	./testTime test/original.pgm blur 7,7 save blur.pgm
+	cmp blur.pgm test/blur.pgm
 
 
 test11: $(PROGS) setup
