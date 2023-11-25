@@ -213,11 +213,11 @@ void ImageDestroy(Image* imgp) { ///
 
   if (*imgp != NULL) {
     // Preserve the value of errno
-    // Free the pixel array
+    // liberta a memória do array de pixeis 
     free((*imgp)->pixel);
     (*imgp)->pixel = NULL;
 
-    // Free the image
+    // liberta a memória da imagem
     free(*imgp);
     *imgp = NULL;
 
@@ -708,7 +708,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       uint8 level1 = ImageGetPixel(img1, x + j, y + i);
       uint8 level2 = ImageGetPixel(img2, j, i);
       COMP++;
-      // compare o pixel de cada imagem, se for diferente é porque as img2 é diferente da img1 e retorna 0
+      // compara o pixel de cada imagem, se for diferente é porque a img2 é diferente da img1 nas posiçoes (x, y) e retorna 0
       if (level1 != level2) {
         return 0; 
       }
@@ -793,9 +793,7 @@ void ImageBlur(Image img, int dx, int dy) { ///
     }
   }
   
-  // calcula o somatório de cada pixel, sendo que cada pixel terá 
-  // a soma de todos os pixeis à sua direita
-  // para cima, ou seja, dos pixeis <=i && <=j 
+  // calcula para cada pixel, o somatório dos pixeis na matriz ixj
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
       int sum = ImageGetPixel(img, j, i);
