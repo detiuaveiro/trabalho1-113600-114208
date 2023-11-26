@@ -83,9 +83,21 @@ test9: $(PROGS) setup
 	cmp blur.pgm test/blur.pgm
 
 test10: $(PROGS) setup
-	./testTime test/original.pgm blur 7,7 save blur.pgm
-	cmp blur.pgm test/blur.pgm
-
+	./testTime pgm/medium/airfield-05_640x480.pgm blur 60,60
+	./testTime pgm/small/art4_300x300.pgm blur 60,60
+	./testTime pgm/small/art3_222x217.pgm blur 60,60
+	./testTime pgm/medium/mandrill_512x512.pgm blur 60,60
+	./testTime pgm/medium/tools_2_765x460.pgm blur 60,60
+	./testTime pgm/medium/airfield-05_640x480.pgm blur 60,60
+	./testTime pgm/large/einstein_940x940.pgm blur 60,60
+	./testTime pgm/large/airfield-05_1600x1200.pgm blur 60,60
+	
+	
+	
+	
+	
+	
+	
 
 test11: $(PROGS) setup
 	./testTime test/paste.pgm locate test/small.pgm

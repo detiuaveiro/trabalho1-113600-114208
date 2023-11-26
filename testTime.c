@@ -37,8 +37,9 @@ int main(int argc, char *argv[]) {
 
         double start_time = cpu_time();
         ImageBlur(img, radiusX, radiusY);
-        printf("Number of Sums: %ld\n", SUMS);
         double finish_time = cpu_time();
+        printf("Number of Sums: %ld\n", SUMS);
+        printf("Number of MULTS: %ld\n", MUL);
         double exec_time = finish_time - start_time;
         printf("Execution time: %f\n", exec_time);
 

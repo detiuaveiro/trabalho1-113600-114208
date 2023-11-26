@@ -10,11 +10,11 @@
 /// 2013, 2023
 
 // Student authors (fill in below):
-// NMec:  Name:
+// NMec: 114208, 113600 Name: Pedro Miguel Miranda Melo, Henrique Manuel Pereira Ferreira
 // 
 // 
 // 
-// Date:
+// Date:26/11/23
 //
 
 #include "image8bit.h"
@@ -708,7 +708,7 @@ int ImageMatchSubImage(Image img1, int x, int y, Image img2) { ///
       uint8 level1 = ImageGetPixel(img1, x + j, y + i);
       uint8 level2 = ImageGetPixel(img2, j, i);
       COMP++;
-      // compara o pixel de cada imagem, se for diferente é porque a img2 é diferente da img1 nas posiçoes (x, y) e retorna 0
+      // compara o pixel da imagem1 com o da imagem2 se forem diferentes retorna 0
       if (level1 != level2) {
         return 0; 
       }
@@ -797,18 +797,9 @@ void ImageBlur(Image img, int dx, int dy) { ///
   for (int i = 0; i < height; i++) {
     for (int j = 0; j < width; j++) {
       int sum = ImageGetPixel(img, j, i);
-      if (i > 0) {
-        SUMS++;
-        sum += sumMatrix[i - 1][j];
-      }
-      if (j > 0) {
-        SUMS++;
-        sum += sumMatrix[i][j - 1];
-      }
-      if (i > 0 && j > 0) {
-        SUMS++;
-        sum -= sumMatrix[i - 1][j - 1];
-      }
+      if (i > 0) {SUMS++;sum += sumMatrix[i - 1][j];}
+      if (j > 0) {SUMS++;sum += sumMatrix[i][j - 1];}
+      if (i > 0 && j > 0) {SUMS++;sum -= sumMatrix[i - 1][j - 1];}
       sumMatrix[i][j] = sum;
     }
   }
@@ -823,42 +814,21 @@ void ImageBlur(Image img, int dx, int dy) { ///
       int y2 = i + dy;
       
       // ajusta para os limites do pixeis à sua volta consoante dx e dy
-      if (x1 < 0) {
-        x1 = 0;
-      }
-      if (x2 >= width) {
-        SUMS++;
-        x2 = width - 1;
-      }
-      if (y1 < 0) {
-        y1 = 0;
-      }
-      if (y2 >= height) {
-        SUMS++;
-        y2 = height - 1;
-      }
+      if (x1 < 0) {x1 = 0;}
+      if (x2 >= width) {SUMS++;x2 = width - 1;}
+      if (y1 < 0) {y1 = 0;}
+      if (y2 >= height) {SUMS++;y2 = height - 1;}
       
       // calcula a soma dos pixeis à sua volta
       int sum = sumMatrix[y2][x2];
-      if (x1 > 0) {
-        SUMS++;
-        sum -= sumMatrix[y2][x1 - 1];
-      }
-      if (y1 > 0) {
-        SUMS++;
-        sum -= sumMatrix[y1 - 1][x2];
-      }
-      if (x1 > 0 && y1 > 0) {
-        SUMS++;
-        sum += sumMatrix[y1 - 1][x1 - 1];
-      }
+      if (x1 > 0) {SUMS++;sum -= sumMatrix[y2][x1 - 1];}
+      if (y1 > 0) {SUMS++;sum -= sumMatrix[y1 - 1][x2];}
+      if (x1 > 0 && y1 > 0) {SUMS++;sum += sumMatrix[y1 - 1][x1 - 1];}
       
       // calcula o numero de pixeis à sua volta e faz a média desses pixeis
       int count = (x2 - x1 + 1) * (y2 - y1 + 1);
       int mean = round((double)sum / count);
-
       MUL += 2;
-      
       // atribui o valor do novo pixel na posição (j, i)
       ImageSetPixel(img, j, i, mean);
     }
@@ -869,4 +839,51 @@ void ImageBlur(Image img, int dx, int dy) { ///
     free(sumMatrix[i]);
   }
   free(sumMatrix);
+}
+
+void ImageBlurBasica(Image img, int dx, int dy) { ///
+  // Insert your code here!
+  assert (img != NULL);
+  assert (dx >= 0 && dy >= 0);
+
+  // Create a temporary image to store the blurred result
+  Image tempImg = ImageCreate(img->width, img->height, img->maxval);
+
+  // Iterate over the pixels of the image
+  for (int y = 0; y < img->height; y++) {
+    for (int x = 0; x < img->width; x++) {
+      // Calculate the sum of pixel values in the neighborhood
+      int sum = 0;
+      int count = 0;
+      for (int i = -dy; i <= dy; i++) {
+        for (int j = -dx; j <= dx; j++) {
+          // Calculate the coordinates of the current pixel
+          SUMS += 2;
+          int nx = x + j;
+          int ny = y + i;
+
+          // Check if the pixel is within the image boundaries
+          if (nx >= 0 && nx < img->width && ny >= 0 && ny < img->height) {
+            // Add the pixel value to the sum
+            SUMS += 2;
+            sum += ImageGetPixel(img, nx, ny);
+            count++;
+          }
+        }
+      }
+      // Calculate the average pixel value
+      uint8 average = (uint8)round((sum / (double)count));
+      MUL++;
+      
+      // Set the average pixel value in the temporary image
+      ImageSetPixel(tempImg, x, y, average);
+    }
+  }
+
+  // Copy the blurred image back to the original image
+  img->pixel = tempImg->pixel;
+  tempImg = NULL;
+
+  // Free the memory allocated for the temporary image
+  ImageDestroy(&tempImg);
 }
